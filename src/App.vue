@@ -5,59 +5,59 @@
     </h1>
     <Card v-bind:profile="searchRes"></Card>
 
-    <div class="tab-container">
-      <span class="tab" @click="clickTwitter()">Twitter</span>
-      <span class="tab" @click="clickIg()">TikTok</span>
-    </div>
-    <!-- <transition-group name="side-fade"> -->
-    <input type="text" name="" id="" v-model="username" />
+    <input
+      type="text"
+      class="username-input"
+      v-model="username"
+      placeholder="Username"
+    />
+    <div class="btn-container">
+      <div id="twitter" class="flex-container" v-if="!show">
+        <button class="btn" @click="searchSocialNetwork('twitter')">
+          Twitter
 
-    <div id="twitter" class="flex-container" v-if="!show">
-      <button class="btn" @click="searchTwitter()">
-        Twitter
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="icon icon-tabler icon-tabler-tools-kitchen"
+            width="30"
+            height="30"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="#2c3e50"
+            fill="none"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <!-- <path stroke="none" d="M0 0h24v24H0z" fill="none" /> -->
+            <path d="M4 3h8l-1 9h-6z" />
+            <path d="M7 18h2v3h-2z" />
+            <line x1="8" y1="12" x2="8" y2="18" />
+          </svg>
+        </button>
+      </div>
+      <div id="instagram" class="flex-container">
+        <button class="btn" @click="searchSocialNetwork('tiktok')">
+          TikTok
 
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="icon icon-tabler icon-tabler-tools-kitchen"
-          width="30"
-          height="30"
-          viewBox="0 0 24 24"
-          stroke-width="1.5"
-          stroke="#2c3e50"
-          fill="none"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <!-- <path stroke="none" d="M0 0h24v24H0z" fill="none" /> -->
-          <path d="M4 3h8l-1 9h-6z" />
-          <path d="M7 18h2v3h-2z" />
-          <line x1="8" y1="12" x2="8" y2="18" />
-        </svg>
-      </button>
-    </div>
-    <div id="instagram" class="flex-container" v-if="show">
-      <!-- <input type="text" name="" id="" /> -->
-      <button class="btn">
-        TikTok
-
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="icon icon-tabler icon-tabler-tools-kitchen"
-          width="30"
-          height="30"
-          viewBox="0 0 24 24"
-          stroke-width="1.5"
-          stroke="#2c3e50"
-          fill="none"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <!-- <path stroke="none" d="M0 0h24v24H0z" fill="none" /> -->
-          <path d="M4 3h8l-1 9h-6z" />
-          <path d="M7 18h2v3h-2z" />
-          <line x1="8" y1="12" x2="8" y2="18" />
-        </svg>
-      </button>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="icon icon-tabler icon-tabler-tools-kitchen"
+            width="30"
+            height="30"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="#2c3e50"
+            fill="none"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <!-- <path stroke="none" d="M0 0h24v24H0z" fill="none" /> -->
+            <path d="M4 3h8l-1 9h-6z" />
+            <path d="M7 18h2v3h-2z" />
+            <line x1="8" y1="12" x2="8" y2="18" />
+          </svg>
+        </button>
+      </div>
     </div>
 
     <div class="circle"></div>
@@ -81,13 +81,26 @@ export default {
     clickTwitter() {
       this.show = false;
     },
-    async searchTwitter() {
-      const { data } = await axios.get(
-        `http://188.166.85.199:1313/twitter/${this.username}`
-      );
-      console.log(data);
-      this.searchRes = data;
-      this.numFollowers = data["FollowersCount"];
+    async searchSocialNetwork(socialNetwork) {
+      try {
+        const { data } = await axios.get(
+          `http://188.166.85.199:1313/${socialNetwork}/${this.username}`
+        );
+        this.searchRes = data;
+        this.searchRes.error = false;
+        this.searchRes.socialNetwork = socialNetwork;
+      } catch (err) {
+        console.log(err);
+
+        this.searchRes = {
+          username: "Error getting user",
+          followersCount: 0,
+          postsCount: 0,
+          error: true,
+        };
+      }
+
+      // console.log(data);
     },
   },
   data() {
@@ -103,6 +116,16 @@ export default {
 
 <style>
 @import url("https://fonts.googleapis.com/css2?family=Nunito:wght@200;400;600;900&display=swap");
+
+:root {
+  --green: #83f7c7;
+  --purple: #8d83f7;
+  --light-purple: #f0edfc;
+  --deep-purple: #373362;
+  --twitter-blue: #83b5f7;
+  --tiktok-purple: #9e83f7;
+  --error: #f78383;
+}
 
 #app {
   display: flex;
@@ -143,7 +166,7 @@ export default {
 }
 
 #spatula {
-  color: #8d83f7;
+  color: var(--purple);
   /* font-weight: 700; */
 }
 
@@ -156,7 +179,7 @@ export default {
 .circle {
   height: 500px;
   width: 500px;
-  background-color: #f0edfc;
+  background-color: var(--light-purple);
   border-radius: 50%;
   z-index: -1;
   position: fixed;
@@ -188,11 +211,28 @@ button {
   box-shadow: -1px 5px 15px 5px #e3e0f1;
 }
 
+.btn-container {
+  display: flex;
+  gap: 20px;
+}
+
 .btn:hover {
   -webkit-box-shadow: -1px 5px 15px 5px #d9d6e6;
   box-shadow: -1px 5px 15px 5px #d9d6e6;
   cursor: pointer;
   transform: scale(1.01);
+}
+
+.username-input {
+  border: none;
+  outline: none;
+  padding: 10px;
+  margin: 30px 0;
+  font-size: 20px;
+  text-align: center;
+  background: var(--light-purple);
+  border: 1px solid var(--purple);
+  border-radius: 8px;
 }
 
 @media only screen and (max-width: 600px) {
@@ -204,6 +244,9 @@ button {
   }
   #ad-copy {
     font-size: 2.5rem;
+  }
+  .username-input {
+    width: 84%;
   }
 }
 </style>
